@@ -5,5 +5,7 @@ server {
   listen [::]:80 default_server;
   server_name _;
 
+  include location/stub_status.conf
+
   return 444;
 }

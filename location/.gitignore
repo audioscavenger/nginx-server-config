@@ -1,0 +1,10 @@
+# Ignore everything but location_example and other examples
+/*
+
+# Except
+!.gitignore
+!location_example.conf
+!netdata.conf
+!grafana.conf
+!prometheus.conf
+!stub_status.conf

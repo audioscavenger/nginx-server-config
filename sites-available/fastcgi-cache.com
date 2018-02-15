@@ -57,6 +57,9 @@ server {
     fastcgi_cache_valid 60m;
   }
 
+  ## add here location alias examples
+  # include location/location_example.conf
+
   ## Rewrite robots.txt
   rewrite ^/robots.txt$ /index.php last;
 
