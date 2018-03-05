@@ -133,7 +133,9 @@ The following site structure is used throughout this repository:
 #### conf.d
 
 ├── cloudflare.conf             : implement real_ip_header for Cloudflare IP forwarding (doesn't hurt if you don't use it).
+
 ├── origin-pull-ca.pem          : CloudFlare presents certificates signed by a CA with the following certificate. See https://support.cloudflare.com/hc/en-us/articles/204494148
+
 ├── cloudflare_ipv4.conf        : Cloudflare ipv4 proxies
 ├── cloudflare_ipv6.conf        : Cloudflare ipv6 proxies
 └── webp.conf                   : webp and jxr image mappings
