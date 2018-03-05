@@ -1,0 +1,43 @@
+## Catch-all server block, resulting in a 444 response for unknown domains:
+## Allow Access To Our Domain Only: If bot is just making random server scan 
+## for all domains, just deny it. You must only allow configured virtual domain 
+## or reverse proxy requests. You don’t want to display request using an IP address.
+
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+
+  ## For high load servers only: increase the maximum number 
+  ## of connections that can be queued for acceptance by NGINX 
+  ## in both your operating system and the NGINX configuration:
+  ## 1) cat /proc/sys/net/core/somaxconn
+  ## 2) sysctl -w net.core.somaxconn=1024
+  ## 3) echo "net.core.somaxconn = 1024" | sudo tee -a /etc/sysctl.conf
+  # listen 80 default_server backlog 1024;
+  # listen [::]:80 default_server backlog 1024;
+
+  server_name _;
+
+  # Bad Bot Blocker
+  include /etc/nginx/bots.d/ddos.conf; 
+ 
+  include global/server/security-general.conf;
+
+  return 444;
+}
+
+server {
+  listen 443;
+  listen [::]:443;
+  server_name _;
+
+  # Bad Bot Blocker
+  include /etc/nginx/bots.d/ddos.conf; 
+ 
+  include global/server/security-general.conf;
+
+  ## @todo: This just won't work because indeed you don't have a certificate
+  ## for your non-existant domains. Instead of HTTP 444 you will get this:
+  ## SSL: no alternative certificate subject name matches target host name 'xyz.domain.com'
+  return 444;
+}

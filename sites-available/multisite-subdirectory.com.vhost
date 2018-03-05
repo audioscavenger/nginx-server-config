@@ -4,27 +4,26 @@ server {
   listen [::]:80;
 
   ## Server name to listen for
-  server_name www.singlesite.com;
+  server_name www.multisite-subdirectory.com;
 
   ## Path to document root
-  root /sites/singlesite.com/public;
-
-
-
-
+  root /sites/multisite-subdirectory.com/public;
 
   ## File to be used as index
   index index.php;
 
   ## Overrides logs defined in nginx.conf, allows per site logs.
-  access_log /sites/singlesite.com/logs/access.log;
-  error_log /sites/singlesite.com/logs/error.log;
+  access_log /sites/multisite-subdirectory.com/logs/access.log;
+  error_log /sites/multisite-subdirectory.com/logs/error.log;
 
   ## Default server block rules
   include global/server/defaults.conf;
 
+  ## Static files, images etc
+  include global/server/static-files.conf;
 
-
+  ## Multisite subdirectory install
+  include global/server/multisite-subdirectory.conf;
 
   location / {
     try_files $uri $uri/ /index.php?$args;
@@ -39,8 +38,8 @@ server {
     fastcgi_pass   $upstream;
   }
 
-  ## add here location alias examples
-  # include location/location_example.conf
+  ## add here locations alias examples
+  # include locations/location_example.conf;
 
   ## Rewrite robots.txt
   rewrite ^/robots.txt$ /index.php last;
@@ -50,7 +49,7 @@ server {
 server {
   listen 80;
   listen [::]:80;
-  server_name singlesite.com;
+  server_name multisite-subdirectory.com;
 
-  return 301 $scheme://www.singlesite.com$request_uri;
+  return 301 $scheme://www.multisite-subdirectory.com$request_uri;
 }

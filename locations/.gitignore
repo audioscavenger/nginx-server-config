@@ -8,3 +8,5 @@
 !grafana.conf
 !prometheus.conf
 !stub_status.conf
+!wp-admin_example.conf
+!auth-your-site_example.conf

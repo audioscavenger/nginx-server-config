@@ -1,0 +1,60 @@
+nginx.conf
+│
+├── conf.d
+│   ├── botblocker-nginx-settings.conf
+│   ├── cloudflare.conf
+│   ├── origin-pull-ca.pem
+│   ├── cloudflare_ipv4.conf
+│   ├── cloudflare_ipv6.conf
+│   ├── globalblacklist.conf
+│   └── webp.conf
+├── global
+│   ├── fastcgi.conf
+│   ├── fastcgi-params.conf
+│   ├── gzip.conf
+│   ├── http.conf
+│   ├── limits.conf
+│   ├── logs.conf
+│   ├── mime-types.conf
+│   ├── php-pool.conf
+│   └── server
+│       ├── Content-Security-Policy.conf
+│       ├── defaults.conf
+│       ├── exclusions.conf
+│       ├── fastcgi-cache.conf
+│       ├── multisite-subdirectory.conf
+│       ├── outdated.conf
+│       ├── proxy_params.conf
+│       ├── security.conf
+│       ├── security-general.conf
+│       ├── ssl.conf
+│       └── static-files.conf
+│
+├── locations
+│   ├── auth-your-site_example.conf
+│   ├── grafana.conf
+│   ├── location_example.conf
+│   ├── netdata.conf
+│   ├── prometheus.conf
+│   ├── stub_status.conf
+│   └── wp-admin_example.conf
+│
+├── sites-available
+│   ├── admin.derewonko.com.vhost
+│   ├── blog.derewonko.com-fcgicache.vhost
+│   ├── blog.derewonko.com.vhost
+│   ├── cdn.derewonko.com.vhost
+│   ├── default.vhost
+│   ├── derewonko.com.fcgicache.vhost
+│   ├── derewonko.com.vhost
+│   ├── fastcgi-cache.com.vhost
+│   ├── localhost.vhost
+│   ├── multisite-subdirectory.com.vhost
+│   ├── multisite-subdomain.com.vhost
+│   ├── singlesite.com.vhost
+│   ├── ssl.com.vhost
+│   └── ssl-fastcgi-cache.com.vhost
+│
+└── upstreams
+    ├── php70.conf
+    └── php71.conf

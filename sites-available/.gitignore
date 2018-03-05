@@ -3,10 +3,10 @@
 
 # Except
 !.gitignore
-!default
-!fastcgi-cache.com
-!multisite-subdirectory.com
-!multisite-subdomain.com
-!singlesite.com
-!ssl.com
-!ssl-fastcgi-cache.com
+!default.vhost
+!fastcgi-cache.com.vhost
+!multisite-subdirectory.com.vhost
+!multisite-subdomain.com.vhost
+!singlesite.com.vhost
+!ssl.com.vhost
+!ssl-fastcgi-cache.com.vhost

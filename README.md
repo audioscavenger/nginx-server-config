@@ -15,53 +15,71 @@ Looking for a modern hosting environment provisioned using Ansible? Check out [W
 
 ### PHP configuration
 
-The php-fpm pool configuration is located in `global/php-pool.conf` and defaults to PHP 7.1.  It will need modified if you want the default php-fpm pool service to be a different PHP version.  Additional PHP version upstream definitions can be added to the `/upstreams` folder (a PHP 7.0 sample is provided there).  You can either use the default pool using `$upstream` in your nginx configurations or the specific upstream definition (i.e. php71, php70) setup by your custom upstream definitions.
+The php-fpm pool configuration is located in `global/php-pool.conf` and defaults to PHP 7.0.  It will need modified if you want the default php-fpm pool service to be a different PHP version.  Additional PHP version upstream definitions can be added to the `/upstreams` folder (a PHP 7.0 and 7.1 samples are provided there).  The default pool is defined using `$upstream` in your server configurations, or you can use specific upstream definition (i.e. php71, php70, php53, etc) if they exist under `/upstreams`.
 
-For example, currently the nginx configuration for `singlesite.com` has the following set for php requests:
+For example, currently all the nginx vhosts have the same following set for php requests, defined under `nginx.conf` ($upstream -> php7.0 by default):
 
 ```
 fastcgi_pass    $upstream
 ```
 
-You could change that to the following to use the php 7.0 php service instead (assuming that php7.0-fpm service is running).
+You could change a particular vhost server to the following to use the php 7.1 service instead (assuming that php7.1-fpm service is running).
 
 ```
-fastcgi_pass    php70
+fastcgi_pass    php71
 ```
 
 This effectively allows you to have different server blocks execute different versions of PHP if needed.
 
-### Site configuration
+### Installation
 
 You can use these sample configurations as reference or directly by replacing your existing nginx directory. Follow the steps below to replace your existing nginx configuration.
 
-Backup any existing config:
+Backup any existing config by moving it:
 
 `sudo mv /etc/nginx /etc/nginx.backup`
 
+Backup any existing config by zipping it:
+
+`sudo tar cvf /etc/nginx /etc/nginx-$(date +"%Y%m%d").tgz`
+
 Clone the repo:
 
-`sudo git clone https://github.com/A5hleyRich/wordpress-nginx.git /etc/nginx`
+`sudo git clone https://github.com/audioscavenger/wordpress-nginx.git /etc/nginx`
 
-Symlink the default file from _sites-available_ to _sites-enabled_, which will setup a catch-all server block. This will ensure unrecognised domains return a 444 response.
+Symlink the default file from _/sites-available_ to _/sites-enabled_, which will setup a catch-all server block. This will ensure unrecognised domains return a 444 response.
 
+Option 1: manual:
 `sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default`
 
-Copy one of the example configurations from _sites-available_ to _sites-available/yourdomain.com_:
+Option 2: install nginx_ensite
+```
+git clone https://github.com/audioscavenger/nginx_ensite.git /tmp/nginx_ensite
+cd /tmp/nginx_ensite
+sudo make install
 
-`sudo cp /etc/nginx/sites-available/singlesite.com /etc/nginx/sites-available/yourdomain.com`
+sudo nginx_ensite default.vhost
+```
+
+Duplicate one of the example configurations from _/sites-available_ to _/sites-available/yourdomain.com.vhost_:
+
+`sudo cp /etc/nginx/sites-available/singlesite.com.vhost /etc/nginx/sites-available/yourdomain.com.vhost`
 
 Edit the site accordingly, paying close attention to the server name and paths.
 
-To enable the site, symlink the configuration into the _sites-enabled_ directory:
+To enable the site, symlink the configuration into the _/sites-enabled_ directory:
 
-`sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/yourdomain.com`
+Option 1: manual:
+`sudo ln -s /etc/nginx/sites-available/yourdomain.com.vhost /etc/nginx/sites-enabled/yourdomain.com.vhost`
+
+Option 2: using nginx_ensite
+`sudo nginx_ensite yourdomain.com.vhost`
 
 Test the configuration:
 
 `sudo nginx -t`
 
-If the configuration passes, restart Nginx:
+If the configuration passes, reload Nginx:
 
 `sudo /etc/init.d/nginx reload`
 
@@ -74,8 +92,10 @@ This repository has the following structure, which is based on the conventions u
 ├── conf.d
 ├── global
     └── server
+├── locations
 ├── sites-available
 ├── sites-enabled
+├── upstreams
 ```
 
 __conf.d__ - configurations for additional modules.
@@ -84,9 +104,13 @@ __global__ - configurations within the `http` block.
 
 __global/server__ - configurations within the `server` block. The `defaults.conf` file should be included on the majority of sites, which contains sensible defaults for caching, file exclusions and security. Additional `.conf` files can be included as needed on a per-site basis.
 
+__locations__ - configurations for individual locations (used under server definitions).
+
 __sites-available__ - configurations for individual sites (virtual hosts).
 
 __sites-enabled__ - symlinks to configurations within the `sites-available` directory. Only sites which have been symlinked are loaded.
+
+__upstreams__ - upstreams, currently only for php-pool. One can imagine CGI and other stuff to be added here one day.
 
 ### Recommended Site Structure
 
@@ -103,3 +127,42 @@ The following site structure is used throughout this repository:
     └── logs
     └── public
 ```
+
+### Walkthrough default configurations provided
+
+#### conf.d
+
+├── cloudflare.conf             : implement real_ip_header for Cloudflare IP forwarding (doesn't hurt if you don't use it).
+├── origin-pull-ca.pem          : CloudFlare presents certificates signed by a CA with the following certificate. See https://support.cloudflare.com/hc/en-us/articles/204494148
+├── cloudflare_ipv4.conf        : Cloudflare ipv4 proxies
+├── cloudflare_ipv6.conf        : Cloudflare ipv6 proxies
+└── webp.conf                   : webp and jxr image mappings
+
+#### locations
+
+├── auth-your-site_example.conf : auth_basic and ip blocking example you can use for wp-admin location.
+├── grafana.conf                : grafana server proxy_pass
+├── location_example.conf       : static files location example to include in a server directive.
+├── netdata.conf                : netdata server proxy_pass
+├── prometheus.conf             : prometheus server proxy_pass
+├── stub_status.conf            : nginx stub_status for monitoring, included in localhost.vhost
+└── wp-admin_example.conf       : wp-admin security location to be included in a server directive.
+
+#### global/server
+
+Anything here is to be included under a server definition.
+
+├── Content-Security-Policy.conf: implementation of W3C recommendations https://www.w3.org/TR/CSP1/ - included in `security.conf`.
+├── defaults.conf               : to be included once only. Includes `exclusions.conf`, `security-general.conf`, and `security.conf`.
+├── exclusions.conf             : security exclusions such as hidden files.
+├── fastcgi-cache.conf          : fastcgi cache buffers and timeouts; included in fastcgi vhosts.
+├── multisite-subdirectory.conf : WordPress multisite-subdirectory example.
+├── outdated.conf               : maps $outdated variable to 0|1 upon $http_user_agent value (not used in any vhost example).
+├── proxy_params.conf           : to be included in servers that use proxy_pass. Included in monitoring location examples.
+├── security.conf               : adds multiple security headers: XSS, clickjacking and includes `Content-Security-Policy.conf`.
+├── security-general.conf       : unset server_tokens and limits http to GET, POST, HEAD.
+├── ssl.conf                    : ssl rules modernized with https://mozilla.github.io/server-side-tls/ssl-config-generator/
+└── static-files.conf           : static file rules: images, scripts, etc. WebP serving enabled by default.
+
+
+

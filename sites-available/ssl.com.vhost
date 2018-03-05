@@ -19,7 +19,7 @@ server {
   ssl_certificate_key /etc/letsencrypt/live/ssl.com/privkey.pem;
 
   ## File to be used as index
-  index index.php;
+  # index index.php index.html;
 
   ## Overrides logs defined in nginx.conf, allows per site logs.
   access_log /sites/ssl.com/logs/access.log;
@@ -28,11 +28,17 @@ server {
   ## Default server block rules
   include global/server/defaults.conf;
 
+  ## Static files, images etc
+  include global/server/static-files.conf;
+
 
 
 
   ## SSL rules
   include global/server/ssl.conf;
+
+  ## wp-admin security rules
+  # include locations/wp-admin_example.conf;
 
   location / {
     try_files $uri $uri/ /index.php?$args;
@@ -40,6 +46,7 @@ server {
 
   location ~ \.php$ {
     try_files $uri =404;
+    error_page 404 = @redirect_home;
     include global/fastcgi-params.conf;
 
     ## Use the php pool defined in the upstream variable.
@@ -47,11 +54,21 @@ server {
     fastcgi_pass   $upstream;
   }
 
-  ## add here location alias examples
-  # include location/location_example.conf
+  ## add here locations aliases
+  # include locations/location_example.conf;
 
   ## Rewrite robots.txt
   rewrite ^/robots.txt$ /index.php last;
+
+
+
+
+
+
+  ## Why show a boring 404 error? Redirect to your home page!
+  location @redirect_home {
+    rewrite ^ https://www.ssl.com permanent;
+  }
 }
 
 ## Redirect http to https
@@ -59,6 +76,8 @@ server {
   listen 80;
   listen [::]:80;
   server_name ssl.com www.ssl.com;
+
+  include global/server/security-general.conf;
 
   return 301 https://www.ssl.com$request_uri;
 }

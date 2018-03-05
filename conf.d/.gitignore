@@ -1,0 +1,5 @@
+botblocker-nginx-settings.conf
+globalblacklist.conf
+
+# Except
+!.gitignore

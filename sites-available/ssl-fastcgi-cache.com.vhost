@@ -1,0 +1,104 @@
+## Define path to cache and memory zone. The memory zone should be unique.
+## keys_zone=ssl-fastcgi-cache.com:100m creates the memory zone and sets the maximum size in MBs.
+## inactive=60m will remove cached items that haven't been accessed for 60 minutes or more.
+fastcgi_cache_path /sites/ssl-fastcgi-cache.com/cache levels=1:2 keys_zone=www.ssl-fastcgi-cache.com:100m inactive=60m;
+## Define memory zone for caching. Should match key_zone in fastcgi_cache_path above.
+fastcgi_cache www.ssl-fastcgi-cache.com;
+
+server {
+  ## Ports to listen on, uncomment one.
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+
+  ## Server name to listen for
+  server_name www.ssl-fastcgi-cache.com;
+
+  ## Path to document root
+  root /sites/ssl-fastcgi-cache.com/public;
+
+  ## Paths to certificate files.
+  ssl_certificate /etc/letsencrypt/live/ssl-fastcgi-cache.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/ssl-fastcgi-cache.com/privkey.pem;
+
+  ## File to be used as index
+  # index index.php index.html;
+
+  ## Overrides logs defined in nginx.conf, allows per site logs.
+  access_log /sites/ssl-fastcgi-cache.com/logs/access.log;
+  error_log /sites/ssl-fastcgi-cache.com/logs/error.log;
+
+  ## Default server block rules
+  include global/server/defaults.conf;
+
+  ## Static files, images etc
+  include global/server/static-files.conf;
+
+  ## Fastcgi cache rules
+  include global/server/fastcgi-cache.conf;
+
+  ## SSL rules
+  include global/server/ssl.conf;
+
+  ## wp-admin security rules
+  #include locations/wp-admin_example.conf;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  # location ~ \.php$ {
+  location ~ ^/(.+)\.php(/|$) {
+    try_files $uri =404;
+    error_page 404 = @redirect_home;
+    include global/fastcgi-params.conf;
+
+    ## Define caching time for responses.
+    fastcgi_cache_valid 200 60m;
+    fastcgi_cache_valid 404 60m;
+
+    ## Skip cache based on rules in global/server/fastcgi-cache.conf.
+    fastcgi_cache_bypass $skip_cache;
+    fastcgi_no_cache $skip_cache;
+
+    ## Use the php pool defined in the upstream variable.
+    ## See global/php-pool.conf for definition.
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass   $upstream;
+  }
+
+  ## add here locations aliases
+  # include locations/location_example.conf;
+
+  ## Rewrite robots.txt
+  rewrite ^/robots.txt$ /index.php last;
+
+  ## Uncomment if using the fastcgi_cache_purge module and Nginx Helper plugin (https://wordpress.org/plugins/nginx-helper/)
+  # location ~ /purge(/.*) {
+  # fastcgi_cache_purge ssl-fastcgi-cache.com "$scheme$request_method$host$1";
+  # }
+
+  ## Why show a boring 404 error? Redirect to your home page!
+  location @redirect_home {
+    rewrite ^ https://www.ssl-fastcgi-cache.com permanent;
+  }
+}
+
+## Redirect http to https
+server {
+  listen 80;
+  listen [::]:80;
+  server_name ssl-fastcgi-cache.com www.ssl-fastcgi-cache.com;
+
+  include global/server/security-general.conf;
+
+  return 301 https://www.ssl-fastcgi-cache.com$request_uri;
+}
+
+## Redirect non-www to www https://www.yes-www.org/why-use-www/
+server {
+  listen 443;
+  listen [::]:443;
+  server_name ssl-fastcgi-cache.com;
+
+  return 301 https://www.ssl-fastcgi-cache.com$request_uri;
+}
