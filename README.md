@@ -130,41 +130,59 @@ The following site structure is used throughout this repository:
 
 ### Walkthrough default configurations provided
 
-#### conf.d
+#### /conf.d
 
 ├── cloudflare.conf             : implement real_ip_header for Cloudflare IP forwarding (doesn't hurt if you don't use it).
 
 ├── origin-pull-ca.pem          : CloudFlare presents certificates signed by a CA with the following certificate. See https://support.cloudflare.com/hc/en-us/articles/204494148
 
 ├── cloudflare_ipv4.conf        : Cloudflare ipv4 proxies
+
 ├── cloudflare_ipv6.conf        : Cloudflare ipv6 proxies
+
 └── webp.conf                   : webp and jxr image mappings
 
-#### locations
+#### /locations
 
-├── auth-your-site_example.conf : auth_basic and ip blocking example you can use for wp-admin location.
+├── auth-your-site_example.conf : auth_basic and ip blocking example you can use for wp-admin location
+
 ├── grafana.conf                : grafana server proxy_pass
-├── location_example.conf       : static files location example to include in a server directive.
-├── netdata.conf                : netdata server proxy_pass
-├── prometheus.conf             : prometheus server proxy_pass
-├── stub_status.conf            : nginx stub_status for monitoring, included in localhost.vhost
-└── wp-admin_example.conf       : wp-admin security location to be included in a server directive.
 
-#### global/server
+├── location_example.conf       : static files location example to include in a server directive
+
+├── netdata.conf                : netdata server proxy_pass
+
+├── prometheus.conf             : prometheus server proxy_pass
+
+├── stub_status.conf            : nginx stub_status for monitoring, included in localhost.vhost
+
+└── wp-admin_example.conf       : wp-admin security location to be included in a server directive
+
+#### /global/server
 
 Anything here is to be included under a server definition.
 
-├── Content-Security-Policy.conf: implementation of W3C recommendations https://www.w3.org/TR/CSP1/ - included in `security.conf`.
-├── defaults.conf               : to be included once only. Includes `exclusions.conf`, `security-general.conf`, and `security.conf`.
-├── exclusions.conf             : security exclusions such as hidden files.
-├── fastcgi-cache.conf          : fastcgi cache buffers and timeouts; included in fastcgi vhosts.
-├── multisite-subdirectory.conf : WordPress multisite-subdirectory example.
-├── outdated.conf               : maps $outdated variable to 0|1 upon $http_user_agent value (not used in any vhost example).
-├── proxy_params.conf           : to be included in servers that use proxy_pass. Included in monitoring location examples.
-├── security.conf               : adds multiple security headers: XSS, clickjacking and includes `Content-Security-Policy.conf`.
-├── security-general.conf       : unset server_tokens and limits http to GET, POST, HEAD.
+├── Content-Security-Policy.conf: implementation of W3C recommendations https://www.w3.org/TR/CSP1/ - included in `security.conf`
+
+├── defaults.conf               : to be included once only. Includes `exclusions.conf`, `security-general.conf`, and `security.conf`
+
+├── exclusions.conf             : security exclusions such as hidden files
+
+├── fastcgi-cache.conf          : fastcgi cache buffers and timeouts; included in fastcgi vhosts
+
+├── multisite-subdirectory.conf : WordPress multisite-subdirectory example
+
+├── outdated.conf               : maps $outdated variable to 0|1 upon $http_user_agent value (not used in any vhost example)
+
+├── proxy_params.conf           : to be included in servers that use proxy_pass. Included in monitoring location examples
+
+├── security.conf               : adds multiple security headers: XSS, clickjacking and includes `Content-Security-Policy.conf`
+
+├── security-general.conf       : unset server_tokens and limits http to GET, POST, HEAD
+
 ├── ssl.conf                    : ssl rules modernized with https://mozilla.github.io/server-side-tls/ssl-config-generator/
-└── static-files.conf           : static file rules: images, scripts, etc. WebP serving enabled by default.
+
+└── static-files.conf           : static file rules: images, scripts, etc. WebP serving enabled by default
 
 
 
