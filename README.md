@@ -185,4 +185,17 @@ Anything here is to be included under a server definition.
 └── static-files.conf           : static file rules: images, scripts, etc. WebP serving enabled by default
 
 
+## Todo
+
+Decide what to enable in `fastcgi.conf`.
+
+## Disclaimer
+
+This is NOT a simple drop-in. You actually have to open and read each files that you are about to use for a public website. Opening a public website is sensitive and you need to understand the basic concepts of nginx. Thus, a lot of sources and comments are included for your sake.
+
+This configuration has been tested with nginx-extra 1.10.3 on Ubuntu and may not be compatible with your version.
+
+Do not trust me or anyone else on the web, you never know what kind of back-door you are about to install unless it's packaged by an official company. Analyse each included file carefully and do not uncomment stuff you don't have a clue about, without searching for it on the web. For instance, a lot of fastcgi configuration is currently commented because it takes me hours to read information available, then implement, then test.
+
+If you have a question or an idea to propose, submit an issue. If are willing to participate, you are most welcome.
 
