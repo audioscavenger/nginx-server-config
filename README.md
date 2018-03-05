@@ -197,5 +197,5 @@ This configuration has been tested with nginx-extra 1.10.3 on Ubuntu and may not
 
 Do not trust me or anyone else on the web, you never know what kind of back-door you are about to install unless it's packaged by an official company. Analyse each included file carefully and do not uncomment stuff you don't have a clue about, without searching for it on the web. For instance, a lot of fastcgi configuration is currently commented because it takes me hours to read information available, then implement, then test.
 
-If you have a question or an idea to propose, submit an issue. If are willing to participate, you are most welcome. 
+If you have a question or an idea to propose, submit an issue. If are willing to participate, you are most welcome.
 
