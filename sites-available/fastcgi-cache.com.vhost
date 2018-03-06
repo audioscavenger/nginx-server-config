@@ -1,7 +1,7 @@
 ## Define path to cache and memory zone. The memory zone should be unique.
 ## keys_zone=fastcgi-cache.com:100m creates the memory zone and sets the maximum size in MBs.
 ## inactive=60m will remove cached items that haven't been accessed for 60 minutes or more.
-fastcgi_cache_path /sites/fastcgi-cache.com/cache levels=1:2 keys_zone=fastcgi-cache.com:100m inactive=60m;
+fastcgi_cache_path /sites/fastcgi-cache.com/cache levels=1:2 keys_zone=www.fastcgi-cache.com:100m inactive=60m;
 
 server {
   ## Ports to listen on
@@ -36,21 +36,23 @@ server {
 
   location ~ \.php$ {
     try_files $uri =404;
-    include global/fastcgi-params.conf;
+    ## Uncomment to redirect to your home page:
+    # error_page 404 = @redirect_home;
 
-    ## Use the php pool defined in the upstream variable.
-    ## See global/php-pool.conf for definition.
-    fastcgi_pass   $upstream;
+    include global/fastcgi_params.conf;
+
+    ## Define caching time for responses.
+    fastcgi_cache_valid 200 60m;
+    fastcgi_cache_valid 404 60m;
 
     ## Skip cache based on rules in global/server/fastcgi-cache.conf.
     fastcgi_cache_bypass $skip_cache;
     fastcgi_no_cache $skip_cache;
 
-    ## Define memory zone for caching. Should match key_zone in fastcgi_cache_path above.
-    fastcgi_cache fastcgi-cache.com;
-
-    ## Define caching time.
-    fastcgi_cache_valid 60m;
+    ## Use the php pool defined in the upstream variable.
+    ## See global/php-pool.conf for definition.
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass   $upstream;
   }
 
   ## add here locations alias examples
@@ -63,6 +65,11 @@ server {
   # location ~ /purge(/.*) {
     # fastcgi_cache_purge fastcgi-cache.com "$scheme$request_method$host$1";
   # }
+
+  ## Why show a boring 404 error? Redirect to your home page!
+  location @redirect_home {
+    rewrite ^ https://$host permanent;
+  }
 }
 
 ## Redirect non-www to www
